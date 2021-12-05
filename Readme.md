@@ -1,4 +1,4 @@
-# Laps
+# laps 📷
 
 This project is motivated by the need of an easy setup for a DSLR-timelaps using existing tools.
 
