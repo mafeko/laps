@@ -1,0 +1,24 @@
+all:
+  hosts:
+  children:
+    client:
+      hosts:
+        192.168.0.166:
+      # vars:
+      #   ansible_python_interpreter: "/usr/bin/python3"
+    server:
+      hosts:
+        100.66.102.123:
+  vars:
+    client:
+      root_folder: "/opt/laps"
+      data_folder: "/opt/laps/pictures"
+      gphoto:
+        user: gphoto
+        group: gphoto
+    server:
+      data_folder: "/mnt/data-volume/timelaps"
+      rsync:
+        user: rsync
+        group: rsync
+        port: 12000

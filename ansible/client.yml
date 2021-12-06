@@ -1,0 +1,37 @@
+---
+- name: Client setup
+  hosts: client
+  become: yes
+  become_user: root
+  remote_user: pi
+
+  tasks:
+    - name: "install deps"
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - rsync
+        - gphoto2
+
+    - name: "create usergroup '{{ client.gphoto.group }}'"
+      ansible.builtin.group:
+        name: "{{ client.gphoto.group }}"
+        state: present
+    - name: "create user '{{ client.gphoto.user }}'"
+      ansible.builtin.user:
+        name: "{{ client.gphoto.user }}"
+        group: "{{ client.gphoto.group }}"
+
+    - name: "Prepare filesystem at '{{ client.data_folder }}'"
+      ansible.builtin.file:
+        path: "{{ client.data_folder }}"
+        state: directory
+        recurse: yes
+        owner: "{{ client.gphoto.user }}"
+        group: "{{ client.gphoto.group }}"
+
+    - name: Place files
+      ansible.builtin.template:
+        src: files/rsync-upload.sh.j2
+        dest: "{{ client.root_folder }}/rsync-upload.sh"

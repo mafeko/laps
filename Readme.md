@@ -41,4 +41,17 @@ systemctl start rsync.service
 systemctl enable rsync.service
 ```
 
+Test the connection from a client connected via the tailscale vpn:
+```bash
+rsync -rdt rsync://IPADDR:12000/
+```
+
 ### Client
+
+## SSH Setup
+
+```bash
+ssh-keygen -f ./client.key -t ecdsa -b 521  
+ssh-copy-id -i ./client.key user@host
+mv client.key ansible/
+```

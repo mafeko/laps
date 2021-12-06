@@ -1,0 +1,27 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  ANSIBLE_RUNNER_IMAGE: "quay.io/ansible/ansible-runner"
+
+tasks:
+  server:
+    cmds:
+      - |
+        docker run -ti --rm \
+        --network host \
+        -v $(PWD)/ansible:/runner:ro \
+        -e ANSIBLE_HOST_KEY_CHECKING="false" \
+        {{ .ANSIBLE_RUNNER_IMAGE }} \
+        ansible-playbook --private-key server.key -i inventory.yml server.yml
+
+  client:
+    cmds:
+      - |
+        docker run -ti --rm \
+        --network host \
+        -v $(PWD)/ansible:/runner:ro \
+        -e ANSIBLE_HOST_KEY_CHECKING="false" \
+        {{ .ANSIBLE_RUNNER_IMAGE }} \
+        ansible-playbook --private-key client.key -i inventory.yml client.yml
