@@ -1,6 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=gphoto2
-Comment=gphoto2 taking timelaps images
-NoDisplay=true
-Exec=gphoto2 --folder "/data/timelaps/timelaps1" --capture-image-and-download --set-config "/main/imgsettings/imageformat=5" --filename %Y%m%d%H%M%S.%C --interval "5"

@@ -7,6 +7,7 @@ vars:
 
 tasks:
   server:
+    desc: Provision the server via ansible
     cmds:
       - |
         docker run -ti --rm \
@@ -17,6 +18,7 @@ tasks:
         ansible-playbook --private-key server.key -i inventory.yml server.yml
 
   client:
+    desc: Provision the client via ansible
     cmds:
       - |
         docker run -ti --rm \
