@@ -1,6 +1,6 @@
 # access rights
-uid = rsync
-gid = rsync
+uid = {{ server.rsync.user }}
+gid = {{ server.rsync.group }}
 # Prevent uploads
 read only = false
 # Prevent leaving predefined path
@@ -11,7 +11,7 @@ lock file = /var/run/rsync.lock
 transfer logging = true
 log file = /var/log/rsync.log
 log format = %h %o %f %l %b
-port = 12000
+port = {{ server.rsync.port }}
 [files]
-path = /mnt/data-volume/timelaps
+path = {{ server.data_folder }}
 comment = rsync main directory

@@ -1,0 +1,38 @@
+---
+- name: Server setup
+  hosts: server
+  become: yes
+  become_user: root
+  remote_user: root
+
+  tasks:
+    - name: "ensure rsync is installed"
+      apt:
+        name: rsync
+        state: latest
+
+    - name: "create usergroup '{{ server.rsync.group }}'"
+      ansible.builtin.group:
+        name: "{{ server.rsync.group }}"
+        state: present
+    - name: "create user '{{ server.rsync.user }}'"
+      ansible.builtin.user:
+        name: "{{ server.rsync.user }}"
+        group: "{{ server.rsync.group }}"
+    - name: "setup data folder '{{ server.data_folder }}'"
+      ansible.builtin.file:
+        path: "{{ server.data_folder }}"
+        state: directory
+        recurse: yes
+        owner: "{{ server.rsync.user }}"
+        group: "{{ server.rsync.group }}"
+
+    - name: Configure rsyncd daemon
+      ansible.builtin.template:
+        src: files/rsyncd.conf.j2
+        dest: /etc/rsyncd.conf
+    - name: Setup rsyncd daemon
+      ansible.builtin.systemd:
+        name: rsync.service
+        state: started
+        enabled: yes

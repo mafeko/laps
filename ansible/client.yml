@@ -1,0 +1,69 @@
+---
+- name: Client setup
+  hosts: client
+  become: yes
+  become_user: root
+  remote_user: pi
+
+  tasks:
+    - name: "install deps"
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - rsync
+        - gphoto2
+
+    # - name: "create usergroup '{{ client.gphoto.group }}'"
+    #   ansible.builtin.group:
+    #     name: "{{ client.gphoto.group }}"
+    #     state: present
+
+    # - name: "create user '{{ client.gphoto.user }}'"
+    #   ansible.builtin.user:
+    #     name: "{{ client.gphoto.user }}"
+    #     groups:
+    #       - "{{ client.gphoto.group }}"
+    #       - "{{ client.gphoto.usb_access_group }}"
+
+    - name: "Prepare filesystem at '{{ client.data_folder }}'"
+      ansible.builtin.file:
+        path: "{{ client.data_folder }}"
+        state: directory
+        recurse: yes
+        owner: "{{ client.gphoto.user }}"
+        group: "{{ client.gphoto.group }}"
+
+    - name: "Copy to {{ client.root_folder }}/rsync-upload.sh"
+      ansible.builtin.template:
+        src: files/rsync-upload.sh.j2
+        owner: "{{ client.gphoto.user }}"
+        mode: "u+rwx"
+        dest: "{{ client.root_folder }}/rsync-upload.sh"
+
+    - name: "Copy to {{ client.root_folder }}/gphoto2-start.sh"
+      ansible.builtin.template:
+        src: files/gphoto2-start.sh.j2
+        dest: "{{ client.root_folder }}/gphoto2-start.sh"
+        owner: "{{ client.gphoto.user }}"
+        mode: "u+rwx"
+
+    - name: "Copy to {{ client.root_folder }}/gphoto.service"
+      ansible.builtin.template:
+        src: files/gphoto.service.j2
+        dest: "{{ client.service_folder }}/gphoto.service"
+        mode: "u+rwx"
+
+    - name: "Enable and start gphoto.service"
+      ansible.builtin.service:
+        name: gphoto.service
+        state: started
+        enabled: yes
+
+    - name: Set up hourly rsync cronjob
+      ansible.builtin.cron:
+        name: "laps rsync job"
+        minute: "*"
+        hour: "*"
+        job: "/usr/bin/env {{ client.root_folder }}/rsync-upload.sh"
+        user: "{{ client.gphoto.user }}"

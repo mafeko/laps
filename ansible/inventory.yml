@@ -1,0 +1,27 @@
+all:
+  hosts:
+  children:
+    client:
+      hosts:
+        100.95.134.119:
+    server:
+      hosts:
+        100.66.102.123:
+  vars:
+    client:
+      root_folder: "/opt/laps"
+      data_folder: "/opt/laps/pictures"
+      service_folder: "/etc/systemd/system"
+      gphoto:
+        user: pi
+        group: pi
+        interval: 120 # seconds
+        imageformat: 0 # see: gphoto2 --get-config imageformat
+      rsync:
+        max_bandwith: "0.5m" # limit bandwith to not eat up all
+    server:
+      data_folder: "/mnt/data-volume/timelaps"
+      rsync:
+        user: rsync
+        group: rsync
+        port: 12000

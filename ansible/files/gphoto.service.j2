@@ -1,0 +1,19 @@
+[Unit]
+Description=gphoto2 service taking a timelaps
+After=network.target
+StartLimitIntervalSec=10
+StartLimitBurst=5
+
+[Path]
+DirectoryNotEmpty=/dev/bus/usb/001
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User={{ client.gphoto.user }}
+ExecStart=/usr/bin/env {{ client.root_folder }}/gphoto2-start.sh
+
+
+[Install]
+WantedBy=multi-user.target
