@@ -44,10 +44,10 @@ all:
   children:
     client:
       hosts:
-        100.95.134.119: # client's IP address (within th tailscale vpn)
+        100.95.134.119: # client's IP address (within the tailscale vpn)
     server:
       hosts:
-        100.66.102.123: # server's IP address (within th tailscale vpn)
+        100.66.102.123: # server's IP address (within the tailscale vpn)
 ```
 
 

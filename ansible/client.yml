@@ -60,10 +60,11 @@
         state: started
         enabled: yes
 
-    - name: Set up hourly rsync cronjob
+    - name: Set up rsync cronjob
       ansible.builtin.cron:
         name: "laps rsync job"
-        minute: "*"
-        hour: "*"
+        day: "{{ client.cron.day }}"
+        hour: "{{ client.cron.hour }}"
+        minute: "{{ client.cron.minute }}"
         job: "/usr/bin/env {{ client.root_folder }}/rsync-upload.sh"
         user: "{{ client.gphoto.user }}"

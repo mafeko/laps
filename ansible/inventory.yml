@@ -19,6 +19,10 @@ all:
         imageformat: 0 # see: gphoto2 --get-config imageformat
       rsync:
         max_bandwith: "0.5m" # limit bandwith to not eat up all
+      cron:
+        day: "*"
+        hour: "*"
+        minute: "*/5"
     server:
       data_folder: "/mnt/data-volume/timelaps"
       rsync:

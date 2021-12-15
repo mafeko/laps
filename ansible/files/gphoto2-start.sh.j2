@@ -3,4 +3,4 @@ sudo killall gvfsd-gphoto2
 sudo killall gvfs-gphoto2-volume-monitor
 sudo gphoto2 --auto-detect
 sudo gphoto2 -a
-sudo gphoto2 --capture-image-and-download --set-config "imageformat={{client.gphoto.imageformat}}" --filename "{{ client.data_folder }}/%Y%m%d%H%M%S.%C" --interval "{{client.gphoto.interval}}"
+sudo gphoto2 --set-config "imageformat={{client.gphoto.imageformat}}" --capture-image-and-download --filename "{{ client.data_folder }}/%Y%m%d%H%M%S.%C" --interval "{{client.gphoto.interval}}"
