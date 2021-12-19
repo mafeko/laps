@@ -3,7 +3,7 @@
 version: "3"
 
 vars:
-  ANSIBLE_RUNNER_IMAGE: "quay.io/ansible/ansible-runner"
+  ANSIBLE_RUNNER_IMAGE: "quay.io/ansible/ansible-runner" # pinning this as cloudalchemy.node_exporter fails with latest
   EXTERNAL_ROLES_DIR: "ansible/external_roles"
   SECRETS_FILE: "./secrets"
 
@@ -30,3 +30,18 @@ tasks:
         -e ANSIBLE_ROLES_PATH="./external_roles/:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles" \
         {{ .ANSIBLE_RUNNER_IMAGE }} \
         ansible-playbook --private-key client.key -i inventory.yml client.yml
+
+  metrics:
+    desc: Provision host to export metrics
+    deps:
+      - deps
+    cmds:
+      - |
+        docker run --rm \
+        --network host \
+        -v $(PWD)/ansible:/runner:ro \
+        --env-file "{{ .SECRETS_FILE }}" \
+        -e ANSIBLE_HOST_KEY_CHECKING="false" \
+        -e ANSIBLE_ROLES_PATH="/usr/share/ansible/roles" \
+        quay.io/ansible/ansible-runner:stable-2.9-latest \
+        bash -lc "ansible-galaxy install cloudalchemy.node_exporter ; ansible-playbook --private-key client.key -i inventory.yml metrics.yml"

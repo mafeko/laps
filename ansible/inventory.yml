@@ -33,3 +33,5 @@ all:
           day: "*"
           hour: "*"
           minute: "*/10"
+      metrics:
+        stats_folder: "/opt/laps"

@@ -1,0 +1,25 @@
+---
+- name: Client setup
+  hosts: client
+  # become: yes
+  become_user: root
+  remote_user: pi
+
+  vars:
+    node_exporter_enabled_collectors:
+      [
+        "systemd",
+        { textfile: { directory: "{{client.metrics.stats_folder}}" } },
+      ]
+
+  # roles:
+  #   - cloudalchemy.node_exporter
+  tasks:
+    - name: Setup cron job with file statistics
+      ansible.builtin.cron:
+        name: "laps: metrics job"
+        day: "*"
+        hour: "*"
+        minute: "*"
+        job: 'echo laps_file_count{path="\"{{ client.data_folder }}\""} $(ls -l {{ client.data_folder }} |wc -l) > {{ client.metrics.stats_folder }}/stats.prom'
+        user: "{{ client.gphoto.user }}"
