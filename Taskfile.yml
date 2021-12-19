@@ -4,26 +4,29 @@ version: "3"
 
 vars:
   ANSIBLE_RUNNER_IMAGE: "quay.io/ansible/ansible-runner"
+  EXTERNAL_ROLES_DIR: "ansible/external_roles"
+  SECRETS_FILE: "./secrets"
 
 tasks:
-  server:
-    desc: Provision the server via ansible
+  deps:
+    desc: Get third party ansible roles
     cmds:
-      - |
-        docker run -ti --rm \
-        --network host \
-        -v $(PWD)/ansible:/runner:ro \
-        -e ANSIBLE_HOST_KEY_CHECKING="false" \
-        {{ .ANSIBLE_RUNNER_IMAGE }} \
-        ansible-playbook --private-key server.key -i inventory.yml server.yml
+      - git clone https://github.com/stefangweichinger/ansible-rclone.git
+    dir: "{{ .EXTERNAL_ROLES_DIR }}"
+    status:
+      - test -d ansible-rclone
 
   client:
     desc: Provision the client via ansible
+    deps:
+      - deps
     cmds:
       - |
         docker run -ti --rm \
         --network host \
         -v $(PWD)/ansible:/runner:ro \
+        --env-file "{{ .SECRETS_FILE }}" \
         -e ANSIBLE_HOST_KEY_CHECKING="false" \
+        -e ANSIBLE_ROLES_PATH="./external_roles/:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles" \
         {{ .ANSIBLE_RUNNER_IMAGE }} \
         ansible-playbook --private-key client.key -i inventory.yml client.yml

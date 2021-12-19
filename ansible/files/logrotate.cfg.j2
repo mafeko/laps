@@ -1,0 +1,13 @@
+# sample logrotate configuration file
+copytruncate
+
+{{client.rclone.log_file}} {
+    rotate 3
+    size 1M
+}
+
+{{client.gphoto.log_file}} {
+    rotate 3
+    size 1M
+}
+
