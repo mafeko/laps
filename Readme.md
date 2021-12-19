@@ -59,6 +59,13 @@ To provision the client run:
 task client
 ```
 
+For monitoring the client, I use prometheus installing node_exporter with some custom extensions (e.g. monitoring the number of pictures on the device):
+
+```bash
+task metrics
+```
+
+
 ### TODO
 
 - [x] (use ansible instead of scripts)
