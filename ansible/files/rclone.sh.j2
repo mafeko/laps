@@ -9,7 +9,7 @@
 #
 # Lockable script boilerplate
 
-LOCKFILE="/var/lock/rsync.service"
+LOCKFILE="/var/lock/rclone.service"
 LOCKFD=99
 
 # PRIVATE
@@ -28,10 +28,10 @@ unlock()            { _lock u; }   # drop a lock
 
 ### BEGIN OF SCRIPT ###
 
-
-
-
-# Simplest example is avoiding running multiple instances of script.
+# avoid running multiple instances
 exlock_now || exit 1
-rsync --bwlimit="{{client.rsync.max_bandwith}}" --remove-source-files --progress -r "{{client.data_folder}}" "rsync://{{ hostvars[groups['server'][0]]['inventory_hostname'] }}:{{server.rsync.port}}/files"
+
+/usr/local/bin/rclone move --bwlimit={{client.rclone.max_bandwith}} --log-level {{client.rclone.log_level}} --log-file={{client.rclone.log_file}} {{client.data_folder}} {{client.rclone.data_destination}}
+
+# unlock
 unlock

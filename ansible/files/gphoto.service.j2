@@ -10,9 +10,11 @@ DirectoryNotEmpty=/dev/bus/usb/001
 [Service]
 Type=simple
 Restart=always
-RestartSec=5
+RestartSec=30
 User={{ client.gphoto.user }}
 ExecStart=/usr/bin/env {{ client.root_folder }}/gphoto2-start.sh
+StandardOutput=append:{{client.gphoto.log_file}}
+StandardError=append:{{client.gphoto.log_file}}
 
 
 [Install]

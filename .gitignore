@@ -1,3 +1,6 @@
 *.key
 *.pub
 *.pem
+ansible/external_roles/*
+!.gitkeep
+secrets

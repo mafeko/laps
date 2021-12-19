@@ -11,20 +11,35 @@
         name: "{{ item }}"
         state: latest
       loop:
-        - rsync
         - gphoto2
 
-    # - name: "create usergroup '{{ client.gphoto.group }}'"
-    #   ansible.builtin.group:
-    #     name: "{{ client.gphoto.group }}"
-    #     state: present
+    - name: "create usergroup '{{ client.gphoto.group }}'"
+      ansible.builtin.group:
+        name: "{{ client.gphoto.group }}"
+        state: present
 
-    # - name: "create user '{{ client.gphoto.user }}'"
-    #   ansible.builtin.user:
-    #     name: "{{ client.gphoto.user }}"
-    #     groups:
-    #       - "{{ client.gphoto.group }}"
-    #       - "{{ client.gphoto.usb_access_group }}"
+    - name: "create user '{{ client.gphoto.user }}'"
+      ansible.builtin.user:
+        name: "{{ client.gphoto.user }}"
+        groups:
+          - "{{ client.gphoto.group }}"
+
+    - name: "Prepare filesystem at '{{ client.root_folder }}'"
+      ansible.builtin.file:
+        path: "{{ client.root_folder }}"
+        state: directory
+        recurse: yes
+        owner: "{{ client.gphoto.user }}"
+        group: "{{ client.gphoto.group }}"
+
+    # GPHOTO
+
+    - name: "make '{{ client.gphoto.user }}' owner of rclone config-file"
+      ansible.builtin.file:
+        path: "/home/{{ client.gphoto.user }}/.config/rclone/rclone.conf"
+        state: file
+        owner: "{{ client.gphoto.user }}"
+        group: "{{ client.gphoto.group }}"
 
     - name: "Prepare filesystem at '{{ client.data_folder }}'"
       ansible.builtin.file:
@@ -34,21 +49,14 @@
         owner: "{{ client.gphoto.user }}"
         group: "{{ client.gphoto.group }}"
 
-    - name: "Copy to {{ client.root_folder }}/rsync-upload.sh"
-      ansible.builtin.template:
-        src: files/rsync-upload.sh.j2
-        owner: "{{ client.gphoto.user }}"
-        mode: "u+rwx"
-        dest: "{{ client.root_folder }}/rsync-upload.sh"
-
-    - name: "Copy to {{ client.root_folder }}/gphoto2-start.sh"
+    - name: "Place {{ client.root_folder }}/gphoto2-start.sh"
       ansible.builtin.template:
         src: files/gphoto2-start.sh.j2
         dest: "{{ client.root_folder }}/gphoto2-start.sh"
         owner: "{{ client.gphoto.user }}"
         mode: "u+rwx"
 
-    - name: "Copy to {{ client.root_folder }}/gphoto.service"
+    - name: "Place {{ client.root_folder }}/gphoto.service"
       ansible.builtin.template:
         src: files/gphoto.service.j2
         dest: "{{ client.service_folder }}/gphoto.service"
@@ -60,11 +68,54 @@
         state: started
         enabled: yes
 
-    - name: Set up rsync cronjob
+    # RCLONE
+
+    - name: "install rclone"
+      include_role:
+        name: ansible-rclone
+      vars:
+        rclone_arch: "arm"
+        rclone_config_location: "/home/{{ client.gphoto.user }}/.config/rclone/rclone.conf"
+        rclone_configs:
+          - name: "nextcloud"
+            properties:
+              type: "webdav"
+              vendor: "nextcloud"
+              url: "{{ lookup('env', 'LAPS_RCLONE_URL') }}"
+              user: "{{ lookup('env', 'LAPS_RCLONE_USER') }}"
+              pass: "{{ lookup('env', 'LAPS_RCLONE_PASS') }}"
+              bearer_token:
+
+    - name: "Place {{ client.root_folder }}/rclone.sh"
+      ansible.builtin.template:
+        src: files/rclone.sh.j2
+        owner: "{{ client.gphoto.user }}"
+        mode: "u+rwx"
+        dest: "{{ client.root_folder }}/rclone.sh"
+
+    - name: Set up rclone cronjob
       ansible.builtin.cron:
-        name: "laps rsync job"
-        day: "{{ client.cron.day }}"
-        hour: "{{ client.cron.hour }}"
-        minute: "{{ client.cron.minute }}"
-        job: "/usr/bin/env {{ client.root_folder }}/rsync-upload.sh"
+        name: "laps: rclone job"
+        day: "{{ client.rclone.cron.day }}"
+        hour: "{{ client.rclone.cron.hour }}"
+        minute: "{{ client.rclone.cron.minute }}"
+        job: "/usr/bin/env {{ client.root_folder }}/rclone.sh"
+        user: "{{ client.gphoto.user }}"
+
+    # LOGROTATE
+
+    - name: "Place {{ client.logrotate.config_file }}"
+      ansible.builtin.template:
+        src: files/logrotate.cfg.j2
+        owner: "{{ client.gphoto.user }}"
+        mode: "u+rwx"
+        dest: "{{ client.logrotate.config_file }}"
+
+    - name: Set up logrotate cronjob
+      ansible.builtin.cron:
+        name: "laps: logrotate job"
+        day: "{{ client.logrotate.cron.day }}"
+        hour: "{{ client.logrotate.cron.hour }}"
+        minute: "{{ client.logrotate.cron.minute }}"
+        job: "logrotate {{ client.logrotate.config_file }}"
         user: "{{ client.gphoto.user }}"
