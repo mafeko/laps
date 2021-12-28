@@ -12,8 +12,8 @@
         { textfile: { directory: "{{client.metrics.stats_folder}}" } },
       ]
 
-  # roles:
-  #   - cloudalchemy.node_exporter
+  roles:
+    - cloudalchemy.node_exporter
   tasks:
     - name: Setup cron job with file statistics
       ansible.builtin.cron:

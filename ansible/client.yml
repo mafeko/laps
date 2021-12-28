@@ -34,13 +34,6 @@
 
     # GPHOTO
 
-    - name: "make '{{ client.gphoto.user }}' owner of rclone config-file"
-      ansible.builtin.file:
-        path: "/home/{{ client.gphoto.user }}/.config/rclone/rclone.conf"
-        state: file
-        owner: "{{ client.gphoto.user }}"
-        group: "{{ client.gphoto.group }}"
-
     - name: "Prepare filesystem at '{{ client.data_folder }}'"
       ansible.builtin.file:
         path: "{{ client.data_folder }}"
@@ -75,7 +68,7 @@
         name: ansible-rclone
       vars:
         rclone_arch: "arm"
-        rclone_config_location: "/home/{{ client.gphoto.user }}/.config/rclone/rclone.conf"
+        rclone_config_location: "/home/{{ client.gphoto.user }}/.rclone.conf"
         rclone_configs:
           - name: "nextcloud"
             properties:
@@ -85,6 +78,13 @@
               user: "{{ lookup('env', 'LAPS_RCLONE_USER') }}"
               pass: "{{ lookup('env', 'LAPS_RCLONE_PASS') }}"
               bearer_token:
+
+    - name: "make '{{ client.gphoto.user }}' owner of rclone config-file"
+      ansible.builtin.file:
+        path: "/home/{{ client.gphoto.user }}/.rclone.conf"
+        state: file
+        owner: "{{ client.gphoto.user }}"
+        group: "{{ client.gphoto.group }}"
 
     - name: "Place {{ client.root_folder }}/rclone.sh"
       ansible.builtin.template:

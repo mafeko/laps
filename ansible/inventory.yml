@@ -3,7 +3,7 @@ all:
   children:
     client:
       hosts:
-        100.95.134.119:
+        100.124.157.113:
     server:
       hosts:
         100.66.102.123:
@@ -22,7 +22,7 @@ all:
         user: "pi"
         group: "pi"
         interval: 120 # seconds
-        imageformat: 0 # see: gphoto2 --get-config imageformat
+        imagesize: 0 # see: gphoto2 --get-config imagesize
         log_file: "/opt/laps/gphoto.log"
       rclone:
         max_bandwith: "500K" # limit bandwith
