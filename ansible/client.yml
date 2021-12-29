@@ -117,5 +117,5 @@
         day: "{{ client.logrotate.cron.day }}"
         hour: "{{ client.logrotate.cron.hour }}"
         minute: "{{ client.logrotate.cron.minute }}"
-        job: "logrotate {{ client.logrotate.config_file }}"
+        job: "logrotate {{ client.logrotate.config_file }} -s logrotate.state {{ client.logrotate.state_file }}"
         user: "{{ client.gphoto.user }}"
