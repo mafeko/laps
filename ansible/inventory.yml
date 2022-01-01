@@ -14,6 +14,7 @@ all:
       service_folder: "/etc/systemd/system"
       logrotate:
         config_file: "/opt/laps/logrotate.cfg"
+        state_file: "/opt/laps/logrotate.status"
         cron:
           day: "*"
           hour: "*"
@@ -21,12 +22,12 @@ all:
       gphoto:
         user: "pi"
         group: "pi"
-        interval: 120 # seconds
+        interval: 3600 # seconds
         imagesize: 0 # see: gphoto2 --get-config imagesize
         log_file: "/opt/laps/gphoto.log"
       rclone:
         max_bandwith: "500K" # limit bandwith
-        data_destination: "nextcloud:/TIMELAPS/test/"
+        data_destination: "nextcloud:/TIMELAPS/ziegler/"
         log_file: "/opt/laps/rclone.log"
         log_level: "INFO"
         cron:
