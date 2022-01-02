@@ -21,5 +21,5 @@
         day: "*"
         hour: "*"
         minute: "*"
-        job: 'echo laps_file_count{path="\"{{ client.data_folder }}\""} $(ls -l {{ client.data_folder }} |wc -l) > {{ client.metrics.stats_folder }}/stats.prom'
+        job: 'echo laps_file_count{path="\"{{ client.data_folder }}\""} $(expr $(ls -l {{ client.data_folder }} |wc -l) - 1) > {{ client.metrics.stats_folder }}/stats.prom'
         user: "{{ client.gphoto.user }}"
