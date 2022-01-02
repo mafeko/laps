@@ -11,7 +11,6 @@ all:
     client:
       root_folder: "/opt/laps"
       data_folder: "/opt/laps/pictures/"
-      service_folder: "/etc/systemd/system"
       logrotate:
         config_file: "/opt/laps/logrotate.cfg"
         state_file: "/opt/laps/logrotate.status"
@@ -22,7 +21,11 @@ all:
       gphoto:
         user: "pi"
         group: "pi"
-        interval: 3600 # seconds
+        cron:
+          minute: "0"
+          hour: "6-18"
+          day: "*"
+          month: "*"
         imagesize: 0 # see: gphoto2 --get-config imagesize
         log_file: "/opt/laps/gphoto.log"
       rclone:

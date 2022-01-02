@@ -49,17 +49,15 @@
         owner: "{{ client.gphoto.user }}"
         mode: "u+rwx"
 
-    - name: "Place {{ client.root_folder }}/gphoto.service"
-      ansible.builtin.template:
-        src: files/gphoto.service.j2
-        dest: "{{ client.service_folder }}/gphoto.service"
-        mode: "u+rwx"
-
-    - name: "Enable and start gphoto.service"
-      ansible.builtin.service:
-        name: gphoto.service
-        state: started
-        enabled: yes
+    - name: Set up gphoto cronjob
+      ansible.builtin.cron:
+        name: "laps: gphoto job"
+        month: "{{ client.gphoto.cron.month }}"
+        day: "{{ client.gphoto.cron.day }}"
+        hour: "{{ client.gphoto.cron.hour }}"
+        minute: "{{ client.gphoto.cron.minute }}"
+        job: "/usr/bin/env {{ client.root_folder }}/gphoto2-start.sh >> {{ client.gphoto.log_file }} 2>&1"
+        user: "{{ client.gphoto.user }}"
 
     # RCLONE
 
