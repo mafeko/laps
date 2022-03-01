@@ -3,4 +3,6 @@ sudo killall gvfsd-gphoto2
 sudo killall gvfs-gphoto2-volume-monitor
 sudo gphoto2 --auto-detect
 sudo gphoto2 -a
-sudo gphoto2 --set-config "imagesize={{client.gphoto.imagesize}}" --capture-image-and-download --filename "{{ client.data_folder }}%Y_%m_%d-%H_%M_%S.%C"
+sudo gphoto2 --set-config "imagesize={{client.gphoto.imagesize}}" --capture-image-and-download --filename "{{ client.data_folder }}%Y_%m_%d/%Y_%m_%d-%H_%M_%S.%C"
+sudo chown -R {{ client.gphoto.user }}:{{ client.gphoto.group }} {{ client.data_folder }}
+sudo chmod -R 771 {{ client.data_folder }}

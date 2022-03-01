@@ -22,8 +22,8 @@ all:
         user: "pi"
         group: "pi"
         cron:
-          minute: "0"
-          hour: "6-18"
+          minute: "0,10,20,30,40,50"
+          hour: "*"
           day: "*"
           month: "*"
         imagesize: 0 # see: gphoto2 --get-config imagesize
@@ -36,6 +36,6 @@ all:
         cron:
           day: "*"
           hour: "*"
-          minute: "*/10"
+          minute: "*"
       metrics:
         stats_folder: "/opt/laps"
