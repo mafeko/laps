@@ -1,0 +1,35 @@
+---
+- name: Server setup
+  hosts: server
+  become: yes
+  become_user: root
+  remote_user: root
+
+  tasks:
+    - name: "install deps"
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - ffmpeg
+
+    - name: "Prepare filesystem at '{{ server.ffmpeg.script_dir }}'"
+      ansible.builtin.file:
+        path: "{{ server.ffmpeg.script_dir }}"
+        state: directory
+        recurse: yes
+
+    - name: "Place {{ server.ffmpeg.script_dir }}/ffmpeg.sh"
+      ansible.builtin.template:
+        src: files/ffmpeg.sh.j2
+        mode: "u+rwx"
+        dest: "{{ server.ffmpeg.script_dir }}/ffmpeg.sh"
+
+    - name: Set up ffmpeg cronjob
+      ansible.builtin.cron:
+        name: "laps: ffmpeg job"
+        month: "{{ server.ffmpeg.cron.month }}"
+        day: "{{ server.ffmpeg.cron.day }}"
+        hour: "{{ server.ffmpeg.cron.hour }}"
+        minute: "{{ server.ffmpeg.cron.minute }}"
+        job: "/usr/bin/env {{ server.ffmpeg.script_dir }}/ffmpeg.sh >> {{ server.ffmpeg.script_dir }}/ffmpeg.log 2>&1"

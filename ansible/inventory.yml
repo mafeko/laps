@@ -8,6 +8,19 @@ all:
       hosts:
         100.66.102.123:
   vars:
+    server:
+      nextcloud:
+        user: "www-data"
+        user_rescan_dir: "/admin/files/TIMELAPS/ziegler"
+      ffmpeg:
+        script_dir: "/opt/laps"
+        root_dir: "/mnt/data-volume/nextcloud/admin/files/TIMELAPS/ziegler"
+        cron:
+          minute: "30"
+          hour: "20"
+          day: "*"
+          month: "*"
+
     client:
       root_folder: "/opt/laps"
       data_folder: "/opt/laps/pictures/"
@@ -22,7 +35,7 @@ all:
         user: "pi"
         group: "pi"
         cron:
-          minute: "0,10,20,30,40,50"
+          minute: "0,30"
           hour: "*"
           day: "*"
           month: "*"

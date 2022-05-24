@@ -31,6 +31,19 @@ tasks:
         {{ .ANSIBLE_RUNNER_IMAGE }} \
         ansible-playbook --private-key client.key -i inventory.yml client.yml
 
+  server:
+    desc: Provision the server via ansible
+
+    cmds:
+      - |
+        docker run -ti --rm \
+        --network host \
+        -v $(PWD)/ansible:/runner:ro \
+        --env-file "{{ .SECRETS_FILE }}" \
+        -e ANSIBLE_HOST_KEY_CHECKING="false" \
+        {{ .ANSIBLE_RUNNER_IMAGE }} \
+        ansible-playbook --private-key server.key -i inventory.yml server.yml
+
   metrics:
     desc: Provision host to export metrics
     deps:

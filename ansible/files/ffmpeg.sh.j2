@@ -1,0 +1,22 @@
+#!/bin/bash
+set -ex
+
+if [ -z "$1" ]; then
+    dir_date=$(date +%F | sed s/-/_/g) # returns date in format YYYY_MM_DD
+else
+    dir_date=$1
+fi
+
+nextcloud_folder="{{server.ffmpeg.root_dir}}/$dir_date"
+cd ${nextcloud_folder}
+
+outfile_name="${dir_date}_timelaps.mp4"
+
+#remove file if exists
+rm -f ${outfile_name} | true
+cat *.jpg | ffmpeg -framerate 7 -f image2pipe -i - -s:v 1626x1080 -c:v libx264 -crf 17 -pix_fmt yuv420p ${outfile_name}
+
+# Fix ownership of file
+chown {{server.nextcloud.user}}:{{server.nextcloud.user}} ${outfile_name}
+# Nextcloud rescan
+sudo -u {{server.nextcloud.user}} php /var/www/html/occ files:scan --path={{server.nextcloud.user_rescan_dir}}/${dir_date}
